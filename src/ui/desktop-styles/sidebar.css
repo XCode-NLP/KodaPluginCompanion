@@ -1,0 +1,767 @@
+/* ---------- Sidebar ----------
+
+   The sidebar runs on one column: rows are inset by --space-4 from the window
+   edge, their content starts --space-4 further in, and every label that belongs
+   to a row (nested chats, section headers) lines up with that same column. */
+
+/* Horizontal padding lives on the sections, not on the shell: the scroll area
+   needs the full width so its scrollbar gutter can replace the right pad and
+   scrolled rows keep the same edges as the fixed ones. */
+.sidebar {
+  /* Chat and project rows keep their hover actions on the same right edge.
+     The edge is optical: icon buttons are --control-xs wide around a 14px
+     glyph, so the box is pulled out by that padding and the glyphs — plus the
+     chat timestamp, which has no box — all end on --row-icon-edge. */
+  --row-icon-edge: var(--space-6);
+  --row-action-bleed: calc((var(--control-xs) - var(--icon-sm)) / 2);
+  --row-actions-inset: calc(var(--row-icon-edge) - var(--row-action-bleed));
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 0 var(--space-4);
+}
+
+.sidebar-drag {
+  position: relative;
+  display: flex;
+  height: 72px;
+  flex-shrink: 0;
+  align-items: flex-end;
+  justify-content: center;
+  /* Logo sits on its own row below the macOS traffic lights (titleBarStyle: hiddenInset) */
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  -webkit-app-region: drag;
+}
+
+/* Window toolbar: icon buttons on the macOS traffic-light row, right of the
+   lights (hiddenInset puts their centres about 20px from the top). */
+.window-toolbar {
+  position: absolute;
+  top: 6px;
+  left: 80px;
+  display: flex;
+  gap: var(--space-1);
+  -webkit-app-region: no-drag;
+}
+
+.window-toolbar-button {
+  display: grid;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  place-items: center;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  -webkit-app-region: no-drag;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.window-toolbar-button:hover {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+/* Pinned to the sidebar's right edge on the traffic-light row. */
+/* Without the logo the row only clears the traffic lights and the collapse button. */
+.sidebar-drag-compact {
+  height: 40px;
+  padding: 0;
+}
+
+.sidebar-collapse-button {
+  position: absolute;
+  top: 6px;
+  right: var(--space-4);
+}
+
+/* No traffic lights (full screen, or not macOS): the buttons take their place. */
+.traffic-lights-hidden .window-toolbar {
+  left: var(--space-4);
+}
+
+/* One continuous contour avoids overlapping translucent borders at the notch. */
+.app.sidebar-collapsed {
+  --notch-right: 176px;
+}
+
+.app.sidebar-collapsed.traffic-lights-hidden {
+  --notch-right: 108px;
+}
+
+/* Give the SVG sole ownership of the notch, including its antialiased ends.
+   Clipping the remaining frame prevents two translucent strokes from stacking. */
+.app.sidebar-collapsed .canvas {
+  border: 0;
+  padding: 1px;
+}
+
+.app.sidebar-collapsed .canvas::after {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  border: 1px solid var(--line);
+  border-radius: inherit;
+  clip-path: polygon(
+    calc(var(--notch-right) - var(--space-4) + 16.5px) 0,
+    100% 0,
+    100% 100%,
+    0 100%,
+    0 48.5px,
+    calc(var(--notch-right) - var(--space-4) + 16.5px) 48.5px
+  );
+  pointer-events: none;
+  content: "";
+}
+
+.collapsed-sidebar-bar {
+  --notch-bottom: 40px;
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+}
+
+.traffic-lights-hidden .collapsed-sidebar-bar .window-toolbar {
+  left: var(--space-5);
+}
+
+.collapsed-sidebar-notch {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  width: 185px;
+  height: 49px;
+  overflow: visible;
+  -webkit-app-region: drag;
+}
+
+.collapsed-sidebar-notch-fill {
+  fill: var(--shell);
+}
+
+.collapsed-sidebar-notch-edge {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1px;
+}
+
+.traffic-lights-hidden .collapsed-sidebar-notch {
+  width: 117px;
+}
+
+.traffic-lights-hidden .collapsed-sidebar-notch-wide,
+.collapsed-sidebar-notch-compact {
+  display: none;
+}
+
+.traffic-lights-hidden .collapsed-sidebar-notch-compact {
+  display: initial;
+}
+
+.collapsed-sidebar-bar .window-toolbar {
+  z-index: 1;
+}
+
+.sidebar-logo {
+  display: block;
+  color: var(--text);
+}
+
+.nav-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  padding: 0 var(--space-4);
+}
+
+.nav-item {
+  display: flex;
+  width: 100%;
+  min-height: var(--control-md);
+  align-items: center;
+  gap: var(--space-4);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-soft);
+  font-size: var(--text-base);
+  text-align: left;
+  transition: background-color 120ms ease;
+}
+
+.nav-item span {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-item svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.nav-item:hover {
+  background: var(--panel-hover);
+}
+
+.nav-item.selected {
+  background: var(--panel-selected);
+  box-shadow: var(--panel-selected-ring, none);
+}
+
+.nav-item.add-project {
+  color: var(--muted);
+}
+
+.sidebar-search {
+  height: var(--control-md);
+  margin: var(--space-2) 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  outline: none;
+  padding: 0 var(--space-4);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--text-base);
+}
+
+.sidebar-search:focus {
+  border-color: var(--line-strong);
+}
+
+.sidebar-search::placeholder {
+  color: var(--muted-2);
+}
+
+.sidebar-scroll {
+  min-height: 0;
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding: 0 0 var(--space-4) var(--space-4);
+}
+
+.section-label {
+  padding: var(--space-6) var(--space-4) var(--space-2);
+  color: var(--muted-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.sidebar-empty {
+  padding: var(--space-2) var(--space-4);
+  color: var(--muted-2);
+  font-size: var(--text-base);
+}
+
+.project-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  margin-bottom: var(--space-1);
+}
+
+.project-row-shell,
+.chat-row-shell {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.project-row-shell {
+  color: var(--text-soft);
+  font-size: var(--text-base);
+}
+
+.chat-row-shell {
+  color: var(--muted);
+  font-size: var(--text-base);
+}
+
+.project-row-shell:hover,
+.chat-row-shell:hover {
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.project-row-shell.selected,
+.chat-row-shell.selected {
+  background: var(--panel-selected);
+  box-shadow: var(--panel-selected-ring, none);
+  color: var(--text);
+}
+
+.project-row-button,
+.chat-row-button {
+  display: flex;
+  position: relative;
+  min-width: 0;
+  min-height: var(--control-md);
+  flex: 1;
+  align-items: center;
+  gap: var(--space-4);
+  color: inherit;
+  text-align: left;
+}
+
+.project-row-button {
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+}
+
+.project-row-button:focus {
+  outline: 0;
+}
+
+.project-row-button:focus-visible {
+  outline: 1px solid var(--line-strong);
+  outline-offset: -1px;
+  border-radius: var(--radius-sm);
+}
+
+/* The timestamp stops on the same right edge as the hover actions, so nothing
+   shifts columns when the icons appear. */
+.chat-row-button {
+  padding: var(--space-2) var(--row-icon-edge) var(--space-2) var(--space-4);
+}
+
+/* Nested chats start where the project label starts: row padding + icon + gap. */
+.chat-row-shell.nested .chat-row-button {
+  padding-left: var(--space-9);
+}
+
+.project-row-button span {
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-row-button svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.project-collapse-toggle {
+  display: flex;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 0;
+  border-radius: var(--radius-xs);
+  color: var(--muted-2);
+}
+
+.project-collapse-toggle:hover,
+.project-collapse-toggle:focus-visible {
+  outline: 0;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.project-row-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+  padding-right: var(--row-actions-inset);
+}
+
+.project-collapse-chevron {
+  transition: transform 140ms ease;
+}
+
+.project-collapse-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.project-rename-form,
+.chat-rename-form {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--row-actions-inset) var(--space-2) var(--space-4);
+  color: inherit;
+}
+
+/* Editing a nested chat keeps the input on the nested chat column. */
+.chat-row-shell.nested .chat-rename-form {
+  padding-left: var(--space-9);
+}
+
+.project-rename-form > svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.project-rename-input,
+.chat-rename-input {
+  width: 100%;
+  min-width: 0;
+  height: var(--control-sm);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  outline: 0;
+  background: var(--panel);
+  color: var(--text-soft);
+  padding: 0 var(--space-4);
+  font-size: var(--text-base);
+}
+
+.project-rename-input:focus,
+.chat-rename-input:focus {
+  border-color:  var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-text);
+}
+
+.row-action {
+  display: grid;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  flex-shrink: 0;
+  place-items: center;
+  /* The button reset keeps the UA `1px 6px`, which leaves 12px of content for a
+     14px glyph: the icon overflows its box and lands off-centre. */
+  padding: 0;
+  border-radius: var(--radius-xs);
+  color: var(--muted-2);
+  opacity: 0;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    opacity 120ms ease;
+}
+
+.row-action.always {
+  opacity: 1;
+}
+
+.project-row-shell:hover .row-action,
+.chat-row-shell:hover .row-action,
+.row-action:focus-visible {
+  opacity: 1;
+}
+
+.row-action:disabled {
+  opacity: 0.45;
+}
+
+.row-action:hover {
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.row-action.danger:hover {
+  color: var(--danger);
+}
+
+.chat-row-actions {
+  display: flex;
+  width: 0;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+  overflow: hidden;
+}
+
+.chat-row-actions .row-action {
+  /* Hide immediately when focus moves to another chat: otherwise the fading
+     icon remains visible for a frame after its layout slot collapses. */
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.chat-row-shell:hover .chat-row-actions,
+.chat-row-actions:focus-within {
+  width: auto;
+  padding-right: var(--row-actions-inset);
+}
+
+.chat-row-actions:focus-within .row-action {
+  opacity: 1;
+}
+
+/* The sidebar is a stacking context below the chat column, so the z-index of a
+   menu counts only inside it. A menu that reaches over the column, as a submenu
+   does, needs the whole sidebar above the column while it is open. */
+.sidebar:has(.project-context-menu) {
+  z-index: 50;
+}
+
+.project-context-menu {
+  position: fixed;
+  z-index: 30;
+  width: 216px;
+  overflow: hidden;
+  border: 1px solid var(--floating-border);
+  border-radius: var(--radius-button);
+  padding: var(--space-2);
+  background: var(--well-solid);
+  box-shadow: var(--floating-shadow);
+}
+
+.project-context-menu button {
+  display: flex;
+  width: 100%;
+  min-height: var(--control-md);
+  align-items: center;
+  gap: var(--space-4);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.project-context-menu button:hover:not(:disabled):not([aria-disabled="true"]),
+.project-context-menu button:focus-visible:not([aria-disabled="true"]) {
+  outline: 0;
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+/* Blocked Telegram items stay focusable so the title hint works in Chromium. */
+.project-context-menu button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.project-context-menu button svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.project-context-menu button.danger:hover:not(:disabled),
+.project-context-menu button.danger:focus-visible {
+  color: var(--danger);
+}
+
+.project-context-menu button.danger:hover:not(:disabled) svg,
+.project-context-menu button.danger:focus-visible svg {
+  color: var(--danger);
+}
+
+.chat-windowed-icon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.context-submenu-row span:first-of-type {
+  flex: 1;
+}
+
+.context-submenu-chevron {
+  margin-left: auto;
+}
+
+.context-submenu {
+  max-height: calc(100vh - var(--space-8));
+}
+
+.project-context-menu-separator {
+  height: 1px;
+  margin: var(--space-2);
+  background: var(--line);
+}
+
+.chat-row {
+  display: flex;
+  width: 100%;
+  min-height: var(--control-md);
+  align-items: center;
+  gap: var(--space-4);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  color: var(--muted);
+  font-size: var(--text-base);
+  text-align: left;
+  transition: background-color 120ms ease;
+}
+
+.chat-row.nested {
+  padding-left: var(--space-9);
+}
+
+.chat-row:hover {
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.chat-row.selected {
+  background: var(--panel-selected);
+  box-shadow: var(--panel-selected-ring, none);
+  color: var(--text);
+}
+
+.chat-row.more {
+  color: var(--muted-2);
+}
+
+.chat-row.more:hover {
+  color: var(--muted);
+}
+
+.chat-title {
+  overflow: hidden;
+  min-width: 0;
+  flex: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-time {
+  flex-shrink: 0;
+  color: var(--muted-2);
+  font-size: var(--text-xs);
+}
+
+.chat-row-shell:hover .chat-time,
+.chat-row-shell:has(.row-action:focus-visible) .chat-time {
+  display: none;
+}
+
+.status-dot {
+  position: absolute;
+  top: 50%;
+  left: var(--space-1);
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--muted-2);
+  transform: translateY(-50%);
+}
+
+.chat-row-shell.nested .status-dot {
+  left: var(--space-7);
+}
+
+.status-dot.running {
+  background: var(--good);
+  box-shadow: 0 0 8px rgba(52, 211, 153, 0.65);
+}
+
+.sidebar-resize-handle {
+  position: absolute;
+  z-index: 8;
+  top: 0;
+  right: 0;
+  width: var(--space-4);
+  height: 100%;
+  cursor: col-resize;
+  outline: 0;
+  touch-action: none;
+}
+
+.sidebar-resize-handle::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--space-3);
+  width: 2px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  content: "";
+  transition: background-color 120ms ease;
+}
+
+.sidebar-resize-handle:hover::after,
+.sidebar.resizing .sidebar-resize-handle::after,
+.sidebar-resize-handle:focus-visible::after {
+  background: color-mix(in srgb, var(--hot-pink) 72%, var(--electric-violet));
+}
+
+.sidebar-footer {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  flex-shrink: 0;
+  padding: var(--space-4) var(--space-4) 0;
+}
+
+.sidebar-account-button {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sidebar-account-button.error svg {
+  color: var(--danger);
+}
+
+.sidebar-account-copy {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.sidebar-account-label {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.15;
+}
+
+.sidebar-account-value {
+  color: var(--text-soft);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.sidebar-settings-button {
+  width: var(--control-lg);
+  flex: 0 0 var(--control-lg);
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+/* Plugin entry points use the same rows as the primary sidebar actions. */
+.plugin-navigation {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar > .plugin-navigation,
+.plugin-workspace-sidebar > .plugin-navigation {
+  margin: 0 var(--space-4) var(--space-4);
+}
+
+.plugin-navigation-more .plugin-navigation-chevron {
+  margin-left: auto;
+  transition: transform 120ms ease;
+}
+
+.plugin-navigation-more.expanded .plugin-navigation-chevron {
+  transform: rotate(180deg);
+}
+
+.plugin-navigation-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.plugin-navigation-list[hidden] {
+  display: none;
+}
+
+.plugin-navigation-badge {
+  color: var(--hot-pink);
+  font-weight: 600;
+}

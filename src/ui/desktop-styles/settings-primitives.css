@@ -1,0 +1,362 @@
+.field {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.field span {
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  height: var(--control-lg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  outline: none;
+  padding: 0 var(--space-5);
+  background: var(--well);
+  color: var(--well-text);
+  font-size: var(--text-base);
+}
+
+.field textarea {
+  height: auto;
+  min-height: 128px;
+  resize: vertical;
+  padding: var(--space-5);
+  line-height: 1.45;
+}
+
+.git-dialog {
+  width: min(624px, calc(100vw - var(--space-10)));
+}
+
+.git-message-field textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0;
+}
+
+.git-dialog-error {
+  border: 1px solid rgba(248, 113, 113, 0.34);
+  border-radius: var(--radius-button);
+  padding: var(--space-5);
+  background: rgba(248, 113, 113, 0.08);
+  color: var(--danger);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.git-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-4);
+}
+
+.git-dialog-actions .secondary-action {
+  min-width: 112px;
+}
+
+.select-control {
+  position: relative;
+  display: grid;
+}
+
+.select-control select {
+  width: 100%;
+  padding-right: var(--control-xl);
+  appearance: none;
+}
+
+.select-control svg {
+  position: absolute;
+  top: 50%;
+  right: var(--space-5);
+  color: var(--muted);
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.cli-source-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.cli-source-option {
+  display: grid;
+  min-height: 80px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  padding: var(--space-5);
+  background: var(--well);
+  text-align: left;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease;
+}
+
+.cli-source-option:hover {
+  border-color: var(--line-strong);
+  background: var(--panel-hover);
+}
+
+.cli-source-option:focus-visible {
+  outline: 2px solid var(--hot-pink);
+  outline-offset: 2px;
+}
+
+.cli-source-option.selected {
+  border-color: var(--hot-pink);
+  background: color-mix(in srgb, var(--well) 88%, var(--hot-pink));
+}
+
+.cli-source-option.warning:not(.selected) {
+  border-color: color-mix(in srgb, var(--danger) 56%, var(--line));
+}
+
+.field .cli-source-copy {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-2);
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cli-source-copy strong {
+  color: var(--text);
+  font-size: var(--text-base);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.cli-source-copy small {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.32;
+}
+
+.field .cli-source-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: inherit;
+  font-size: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.field .cli-source-warning {
+  display: grid;
+  place-items: center;
+  color: var(--danger);
+}
+
+.cli-source-checking {
+  color: var(--muted);
+}
+
+.field .cli-source-radio {
+  width: var(--icon-xs);
+  height: var(--icon-xs);
+  flex: 0 0 var(--icon-xs);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius-pill);
+  background: transparent;
+}
+
+.cli-source-option.selected .cli-source-radio {
+  border-color: var(--hot-pink);
+  background: var(--hot-pink);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--well) 30%, transparent);
+}
+
+.field select {
+  /* Own chevron: the native arrow ignores padding and sticks to the edge. */
+  appearance: none;
+  padding-right: calc(var(--space-5) + 16px + var(--space-2));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b8a94' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-position: right var(--space-5) center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+}
+
+/* Number fields: no native spinner, the value is typed. */
+.field input[type="number"] {
+  appearance: textfield;
+}
+
+.field input[type="number"]::-webkit-inner-spin-button,
+.field input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--hot-pink);
+}
+
+.theme-segment {
+  display: flex;
+  width: fit-content;
+  gap: var(--space-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  padding: var(--space-1);
+  background: var(--panel-2);
+}
+
+.theme-segment button {
+  display: grid;
+  width: var(--control-md);
+  height: var(--control-sm);
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.theme-segment button.active {
+  background: var(--seg-active-bg);
+  box-shadow: var(--seg-active-shadow);
+  color: var(--seg-active-text);
+}
+
+.toggle {
+  display: grid;
+  width: 100%;
+  min-height: var(--control-xl);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  padding: var(--space-2) var(--space-5);
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: var(--text-base);
+  font-weight: 600;
+  text-align: left;
+  transition: background-color 140ms ease;
+}
+
+.toggle:hover {
+  background: var(--panel-2);
+}
+
+.toggle.disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.toggle.disabled:hover {
+  background: var(--panel);
+}
+
+.log-block {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-well);
+  padding: var(--space-5);
+  background: var(--well);
+  color: var(--well-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: var(--text-sm);
+  letter-spacing: 0;
+  line-height: 1.52;
+  white-space: pre-wrap;
+}
+
+.modal-logs {
+  min-height: 200px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* The log block stays the only scroll container; the toolbar rides above it. */
+.logs-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.logs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.logs-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--control-sm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  padding: 0 var(--space-4);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.logs-toolbar button:not(:disabled):hover,
+.logs-toolbar button:focus-visible {
+  outline: 0;
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.logs-toolbar button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.update-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-button);
+  padding: var(--space-5);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@media (max-width: 760px) {
+  .cli-source-list {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-settings-layout,
+  .mode-editor-head {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

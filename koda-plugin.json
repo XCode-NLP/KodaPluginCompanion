@@ -1,0 +1,66 @@
+{
+  "id": "dev.koda.companion",
+  "name": {
+    "ru": "Компаньон β",
+    "en": "Companion β"
+  },
+  "description": {
+    "ru": "Агент ведёт по задаче, открывает места в коде и даёт написать их самому, с подсказками и мягкой проверкой.",
+    "en": "The agent guides you through a task, opens spots in the code for you to write, and gives hints and gentle reviews."
+  },
+  "version": "1.0.0",
+  "publisher": "Koda",
+  "engines": {
+    "koda": ">=1.4.0",
+    "sdk": "1"
+  },
+  "icon": "icon.svg",
+  "main": "bundle/main.js",
+  "ui": "bundle/ui/index.html",
+  "permissions": ["project.read", "project.write", "agent.run", "process.run"],
+  "contributes": {
+    "workspaces": [
+      {
+        "id": "companion",
+        "title": {
+          "ru": "Компаньон",
+          "en": "Companion"
+        },
+        "icon": "graduation-cap",
+        "badge": "β",
+        "sidebar": true
+      }
+    ],
+    "settings": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": ["novice", "middle", "senior"],
+            "default": "middle",
+            "title": { "ru": "Уровень по умолчанию", "en": "Default level" },
+            "description": { "ru": "novice, middle или senior", "en": "novice, middle or senior" }
+          },
+          "involvement": {
+            "type": "string",
+            "enum": ["all", "part", "minimal"],
+            "default": "part",
+            "title": { "ru": "Сколько кода пишете вы", "en": "How much code you write" },
+            "description": { "ru": "all, part или minimal", "en": "all, part or minimal" }
+          },
+          "backgroundSyntaxCheck": {
+            "type": "boolean",
+            "default": true,
+            "title": { "ru": "Подсвечивать синтаксические ошибки на лету", "en": "Highlight syntax errors as you type" }
+          },
+          "confirmReveal": {
+            "type": "boolean",
+            "default": true,
+            "title": { "ru": "Спрашивать перед показом решения", "en": "Ask before revealing a solution" }
+          }
+        }
+      }
+    }
+  }
+}

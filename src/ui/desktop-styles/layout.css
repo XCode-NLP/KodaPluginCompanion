@@ -1,0 +1,374 @@
+/* ---------- App shell ---------- */
+
+.app {
+  --sidebar-width: 280px;
+  /* Surfaces */
+  --shell: var(--surface);
+  --canvas: var(--bg);
+  --panel: var(--surface);
+  --panel-2: var(--surface);
+  --panel-hover: color-mix(in srgb, var(--text) 8%, transparent);
+  /* Выбранная строка заметнее наведения, иначе их не различить. */
+  --panel-selected: color-mix(in srgb, var(--text) 12%, transparent);
+  --text-selection: color-mix(in srgb, var(--accent) 45%, transparent);
+  --line: var(--border);
+  --line-strong: var(--border-strong);
+  /* Text */
+  --text-soft: var(--text);
+  --muted: var(--text-muted);
+  --muted-2: var(--text-subtle);
+  /* Dense surfaces for fields, popovers, logs and code blocks */
+  --well: var(--bg);
+  --well-solid: var(--surface-raised);
+  --well-text: var(--text);
+  --well-muted: var(--text-muted);
+  --code-syntax-addition: #83e6a5;
+  --code-syntax-attr: #ffd166;
+  --code-syntax-comment: #8993a5;
+  --code-syntax-deletion: #ff8a8a;
+  --code-syntax-keyword: #ff7ab6;
+  --code-syntax-literal: #d3b8ff;
+  --code-syntax-meta: #a5b4fc;
+  --code-syntax-string: #8bdc9b;
+  --code-syntax-title: #82c7ff;
+  --code-syntax-variable: #ffb86c;
+  --floating-border: var(--border);
+  --floating-shadow: var(--shadow-popover);
+  /* States */
+  --good: var(--success);
+  --seg-active-bg: var(--bg);
+  --seg-active-text: var(--text);
+  --seg-active-shadow: 0 0 0 1px var(--border);
+  --scrollbar: var(--border-strong);
+  --scrollbar-hover: var(--text-subtle);
+
+  display: grid;
+  height: 100vh;
+  min-height: 0;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  overflow: hidden;
+  background: var(--shell);
+  color: var(--text);
+  color-scheme: dark;
+}
+
+/* A root per chat on screen. The free width is shared by ratio: the main pane
+   keeps its sidebar on top of its share, so both chats get the same room. */
+.app-host {
+  display: flex;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-host > .app {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Minimums hold in any window: a ratio saved in a wider one must not crush a pane. */
+.app-host-split > .app:first-child {
+  flex: calc(1 - var(--split-ratio)) 1 var(--sidebar-width);
+  min-width: calc(var(--sidebar-width) + 240px);
+}
+
+.app-host-split > .app:first-child.sidebar-collapsed {
+  flex-basis: 0;
+  min-width: 360px;
+}
+
+.app-host-split > .app:first-child .canvas {
+  margin-right: 0;
+}
+
+.app-host-split > .app.chat-split-pane {
+  flex: var(--split-ratio) 1 0;
+  min-width: 360px;
+  background: var(--shell);
+}
+
+.app-host-flows > .app.chat-split-pane {
+  display: none;
+}
+
+.app-host-split > .app.mode-flows {
+  flex: 1 1 0;
+}
+
+.app-host-split .app.pane-focused .canvas {
+  border-color: var(--line-strong);
+}
+
+.split-divider {
+  position: absolute;
+  z-index: 7;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--space-4);
+  cursor: col-resize;
+  -webkit-app-region: no-drag;
+}
+
+.split-divider::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: var(--control-xl);
+  border-radius: var(--radius-pill);
+  background: var(--line-strong);
+  content: "";
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: opacity 120ms ease;
+}
+
+.split-divider:hover::after,
+.split-divider:focus-visible::after {
+  opacity: 1;
+}
+
+.split-divider:focus-visible {
+  outline: 0;
+}
+
+.app.sidebar-collapsed {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.chat-surface-bar {
+  position: absolute;
+  z-index: 7;
+  top: var(--space-5);
+  left: calc(var(--space-4) + var(--space-5));
+  display: flex;
+  max-width: calc(100% - 220px);
+  height: var(--control-sm);
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.chat-surface-title {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-surface-close {
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+/* The main pane of a split titles its chat too, past its sidebar or the notch of
+   the collapsed one. */
+.app.chat-split-main {
+  position: relative;
+}
+
+.app.chat-split-main .chat-surface-bar {
+  left: calc(var(--sidebar-width) + var(--space-5));
+  max-width: calc(100% - var(--sidebar-width) - 220px);
+}
+
+.app.chat-split-main.sidebar-collapsed .chat-surface-bar {
+  left: calc(var(--notch-right, 176px) + var(--space-5));
+  max-width: calc(100% - var(--notch-right, 176px) - 220px);
+}
+
+/* The workspace tabs take the chat column's top strip: the title keeps out of them. */
+.app-host-split .app:has(.canvas-browser-open) .chat-surface-bar {
+  max-width: 140px;
+}
+
+.app-host-split .app:has(.browser-pane.maximized) .chat-surface-bar {
+  display: none;
+}
+
+/* macOS draws the traffic lights over the top-left corner, so the canvas moves
+   below a title strip. Elsewhere the system title bar already shows the chat. */
+
+.app.chat-window-titled .chat-surface-bar {
+  top: 0;
+  right: 0;
+  left: 0;
+  max-width: none;
+  height: var(--control-lg);
+  justify-content: center;
+  padding: 0 var(--space-11) 0;
+  -webkit-app-region: drag;
+}
+
+.app.sidebar-collapsed .canvas {
+  margin: var(--space-4);
+}
+
+.app.chat-window-titled .canvas {
+  margin-top: var(--control-lg);
+}
+
+.app[data-theme="light"] {
+  /* @design-tokens:light:start */
+  --bg: oklch(1 0 0); /* #ffffff */
+  --surface: oklch(0.975 0.006 285); /* #f6f6fb */
+  --surface-raised: oklch(1 0 0); /* #ffffff */
+  --border: oklch(0.92 0.006 285); /* #e4e4e8 */
+  --border-strong: oklch(0.64 0.006 285); /* #8c8c90 */
+  --text: oklch(0.21 0.006 285); /* #18181b */
+  --text-muted: oklch(0.48 0.006 285); /* #5d5d61 */
+  --text-subtle: oklch(0.76 0.006 285); /* #b0b1b5 */
+  --accent: oklch(0.5 0.24 315); /* #930dbd */
+  --accent-text: oklch(0.45 0.21 315); /* #7e12a2 */
+  --accent-soft: oklch(0.955 0.025 315); /* #f7ebfc */
+  --on-accent: oklch(1 0 0); /* #ffffff */
+  --danger: oklch(0.5 0.19 25); /* #b71824 */
+  --success: oklch(0.5 0.13 150); /* #137738 */
+  --shadow-popover: 0 8px 24px rgba(13, 8, 28, 0.12);
+  /* @design-tokens:light:end */
+  --code-syntax-addition: #047857;
+  --code-syntax-attr: #b45309;
+  --code-syntax-comment: #6b7280;
+  --code-syntax-deletion: #b91c1c;
+  --code-syntax-keyword: #9d174d;
+  --code-syntax-literal: #7c3aed;
+  --code-syntax-meta: #4f46e5;
+  --code-syntax-string: #047857;
+  --code-syntax-title: #0369a1;
+  --code-syntax-variable: #c2410c;
+  --scrollbar-hover: var(--text-subtle);
+  /* На светлом фоне 8% от текста почти не видно: наведение мягче, выбор
+     плотнее и с тонкой рамкой, выделение текста насыщеннее. */
+  --panel-hover: color-mix(in srgb, var(--text) 6%, transparent);
+  --panel-selected: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  --panel-selected-ring: inset 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent);
+  --text-selection: color-mix(in srgb, var(--accent) 24%, transparent);
+
+  background: var(--shell);
+  color-scheme: light;
+}
+
+/* ---------- Canvas ---------- */
+
+.canvas {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  margin: var(--space-4) var(--space-4) var(--space-4) 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--canvas);
+}
+
+.canvas-drag {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: calc(var(--space-4) * 2 + var(--control-sm));
+  background: linear-gradient(to bottom, var(--canvas) 70%, transparent);
+  pointer-events: none;
+}
+
+.canvas-drag::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--control-xs);
+  content: "";
+  pointer-events: auto;
+  -webkit-app-region: drag;
+}
+
+.canvas-content {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.canvas-content > .hero,
+.canvas-content > .chat-view {
+  min-width: 0;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-9);
+  overflow-y: auto;
+  padding: var(--space-10);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* The composer sets the hero column; the heading and the cards line up with it. */
+.hero-composer {
+  width: min(720px, 100%);
+}
+
+.suggestion-grid {
+  display: grid;
+  width: min(720px, 100%);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.suggestion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+  background: var(--panel);
+  color: var(--text-soft);
+  text-align: left;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.suggestion-card:hover {
+  border-color: var(--line-strong);
+  background: var(--panel-2);
+}
+
+.suggestion-card svg {
+  color: var(--muted);
+}
+
+.suggestion-card strong {
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.suggestion-card span {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+html.chat-window-document {
+  --window-min-width: 560px;
+  --window-min-height: 480px;
+}

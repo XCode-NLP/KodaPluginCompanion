@@ -1,0 +1,226 @@
+/* Общие токены и примитивы Koda, затем стили плагина. */
+@import "./desktop-styles/tokens.css";
+@import "./desktop-styles/base.css";
+@import "./desktop-styles/layout.css";
+@import "./desktop-styles/sidebar.css";
+@import "./desktop-styles/markdown.css";
+@import "./desktop-styles/settings-primitives.css";
+@import "./companion.css";
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.companion-page {
+  height: 100%;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Страница задачи: список живёт в левой колонке Koda, здесь только задача. */
+.companion-page .companion-workspace {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Страница списка сидит под переключателем режимов Koda и сливается с её сайдбаром. */
+.companion-sidebar-page {
+  background: var(--shell);
+}
+
+.companion-sidebar-page .companion-sidebar {
+  height: 100%;
+  background: transparent;
+}
+
+.companion-toasts {
+  position: fixed;
+  right: var(--space-6);
+  bottom: var(--space-6);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 360px;
+}
+
+.companion-toast {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  background: var(--shell);
+  color: var(--text);
+  font-size: var(--text-sm);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.companion-toast > div {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Из settings.css, chat.css и composer.css: страница плагина не тянет их целиком. */
+.modal-overlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.modal {
+  display: flex;
+  width: min(760px, calc(100vw - var(--space-10)));
+  max-height: 82vh;
+  flex-direction: column;
+  gap: var(--space-6);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+  background: var(--shell);
+  box-shadow: var(--shadow-glass-card);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+.modal-title {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.modal-title strong {
+  color: var(--text);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.modal-title span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.danger-action {
+  border-color: rgba(248, 113, 113, 0.34);
+  background: rgba(248, 113, 113, 0.1);
+  color: var(--danger);
+}
+
+.danger-action:hover:not(:disabled) {
+  background: rgba(248, 113, 113, 0.16);
+}
+
+.composer-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 9px;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  transition: background-color 120ms ease;
+}
+
+.composer-icon:hover:not(:disabled) {
+  background: var(--panel-hover);
+}
+
+.composer-icon:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+
+/* У окна приложения есть минимальный размер, у страницы плагина его быть не должно. */
+body {
+  min-width: 0;
+  min-height: 0;
+}
+
+.secondary-action,
+.ghost-button {
+  border: 1px solid var(--line-strong);
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.secondary-action:hover:not(:disabled),
+.ghost-button:hover:not(:disabled) {
+  background: var(--panel-hover);
+}
+
+.primary-action {
+  border-color: rgba(195, 27, 250, 0.34);
+  background: rgba(195, 27, 250, 0.16);
+}
+
+.primary-action:hover:not(:disabled) {
+  background: rgba(195, 27, 250, 0.22);
+}
+
+.stop-action {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgba(248, 113, 113, 0.46);
+  border-radius: var(--radius-pill);
+  background: rgba(248, 113, 113, 0.16);
+  color: var(--danger);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.stop-action:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(248, 113, 113, 0.72);
+  background: rgba(248, 113, 113, 0.22);
+  box-shadow: 0 14px 34px rgba(248, 113, 113, 0.16);
+}
+
+/* Отмена уже ушла в рантайм: кнопка ждёт его вместо повторных нажатий. */
+.stop-action.stopping {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(248, 113, 113, 0.1);
+  cursor: default;
+}
+
+.stop-action svg {
+  flex-shrink: 0;
+}
+
+.companion-toast .icon-button {
+  display: grid;
+  place-items: center;
+  width: var(--control-xs);
+  height: var(--control-xs);
+  border-radius: var(--radius-xs);
+  color: var(--muted);
+}
+
+.companion-toast .icon-button:hover {
+  background: var(--panel-hover);
+}
