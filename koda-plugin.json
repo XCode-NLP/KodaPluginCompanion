@@ -1,8 +1,8 @@
 {
   "id": "dev.koda.companion",
   "name": {
-    "ru": "Компаньон β",
-    "en": "Companion β"
+    "ru": "Компаньон",
+    "en": "Companion"
   },
   "description": {
     "ru": "Агент ведёт по задаче, открывает места в коде и даёт написать их самому, с подсказками и мягкой проверкой.",
@@ -27,7 +27,6 @@
           "en": "Companion"
         },
         "icon": "graduation-cap",
-        "badge": "β",
         "sidebar": true
       }
     ],
